@@ -1,0 +1,17 @@
+"push"
+"10"
+"push"
+"3.3243"
+"add"
+"div"
+"push"
+"1"
+"pop"
+"[rax]"
+"sub"
+"pop"
+"[rbx]"
+"pop"
+"hlt"
+
+

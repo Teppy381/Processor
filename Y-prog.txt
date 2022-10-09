@@ -1,0 +1,7 @@
+push 10 ;comment
+push 3.3243
+add;;;musor
+div                ;derbit
+push 1
+pop [rax]
+sub pop [rbx] pop hlt
