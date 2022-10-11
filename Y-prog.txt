@@ -1,7 +1,11 @@
-push 10 ;comment
-push 3.3243
+push rcx ;comment
+push 3.5673
 add;;;musor
+push [2024]
 div                ;derbit
 push 1
-pop [rax]
-sub pop [rbx] pop hlt
+push [rax]
+sub
+pop [16]
+pop
+hlt
