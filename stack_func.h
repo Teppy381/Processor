@@ -11,12 +11,12 @@
         {                                                                                 \
             if (!(condition))                                                             \
             {                                                                             \
-                printf("Error: %s, file %s, line %i\n", #condition, __FILE__, __LINE__); \
+                printf("Error: %s, file %s, line %i\n", #condition, __FILE__, __LINE__);  \
                 return ReturnNum;                                                         \
             }                                                                             \
         } while (0)
 
-typedef int Elem_t;
+typedef double Elem_t;
 #define ELEM_FORMAT "%i"
 #define CAPACITY_COEF 2
 

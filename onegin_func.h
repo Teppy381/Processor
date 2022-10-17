@@ -11,7 +11,7 @@
         {                                                                                 \
             if (!(condition))                                                             \
             {                                                                             \
-                printf("Error: %s, file %s, line %i\n", #condition, __FILE__, __LINE__); \
+                printf("Error: %s, file %s, line %i\n", #condition, __FILE__, __LINE__);  \
                 return ReturnNum;                                                         \
             }                                                                             \
         } while (0)

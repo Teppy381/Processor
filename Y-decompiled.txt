@@ -1,0 +1,9 @@
+push -2.234
+push rax
+push [2]
+push [rax]
+add
+pop
+mul
+out
+hlt

@@ -19,7 +19,7 @@ int Push(Stack* stack_p, Elem_t var)
     (stack_p->data)[stack_p->size] = var;
     stack_p->size++;
 
-    printf("Push: size = %i, capacity = %i\n", stack_p->size, stack_p->capacity);
+    //printf("Push: size = %i, capacity = %i\n", stack_p->size, stack_p->capacity);
 
     return 0;
 }
@@ -27,11 +27,17 @@ int Push(Stack* stack_p, Elem_t var)
 
 int Pop(Stack* stack_p, Elem_t* output_p)
 {
-    *output_p = (stack_p->data)[stack_p->size - 1];
+    if (stack_p->size < 1)
+    {
+        printf("Cannot pop one more time, stack is empty\n");
+        return 1;
+    }
+
+    *output_p = stack_p->data[stack_p->size - 1];
     DecreaseCapacity(stack_p);
     stack_p->size--;
 
-    printf("Pop: size = %i, capacity = %i\n", stack_p->size, stack_p->capacity);
+    //printf("Pop:  size = %i, capacity = %i\n", stack_p->size, stack_p->capacity);
 
     return 0;
 }
@@ -42,7 +48,7 @@ int IncreaseCapacity(Stack* stack_p)
     stack_p->data = (Elem_t*) realloc(stack_p->data, CAPACITY_COEF * stack_p->capacity * sizeof(Elem_t));
     stack_p->capacity = stack_p->capacity * CAPACITY_COEF;
 
-    printf("Capacity increased: %i\n", stack_p->capacity);
+    //printf("Capacity increased: %i\n", stack_p->capacity);
 
     return 0;
 }
@@ -58,7 +64,7 @@ int DecreaseCapacity(Stack* stack_p)
     stack_p->data = (Elem_t*) realloc(stack_p->data, stack_p->capacity * sizeof(*stack_p->data) / CAPACITY_COEF);
     stack_p->capacity = stack_p->capacity / CAPACITY_COEF;
 
-    printf("Capacity decreased: %i\n", stack_p->capacity);
+    //printf("Capacity decreased: %i\n", stack_p->capacity);
 
     return 0;
 }

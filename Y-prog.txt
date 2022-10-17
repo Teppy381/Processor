@@ -1,11 +1,6 @@
-push rcx ;comment
-push 3.5673
-add;;;musor
-push [2024]
-div                ;derbit
-push 1
-push [rax]
-sub
-pop [16]
-pop
+in
+in
+add
+out
 hlt
+
