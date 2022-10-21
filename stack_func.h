@@ -17,7 +17,7 @@
         } while (0)
 
 typedef double Elem_t;
-#define ELEM_FORMAT "%i"
+#define ELEM_FORMAT "%lg"
 #define CAPACITY_COEF 2
 
 struct Stack

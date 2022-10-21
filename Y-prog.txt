@@ -1,6 +1,7 @@
+push 12.24
+faf:
+push 10
 in
-in
-add
+ja faf
+push 1242
 out
-hlt
-

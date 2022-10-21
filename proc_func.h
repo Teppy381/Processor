@@ -14,9 +14,14 @@ typedef struct Proc_struct
 } Proc_struct;
 
 
+const double ZERO_ACCURACY = 0.000001;
 
 
 int CheckSignature(FILE* input_file, const int local_version, const char* in_file_name);
+
+void ClearInput();
+
+int IsEqual(Elem_t x, Elem_t y);
 
 int ExecuteCode(Proc_struct* proc_p);
 

@@ -5,6 +5,40 @@ const char* register_list[] =
     "rax", "rbx", "rcx", "rdx"
 };
 
+const char* jump_list[] =
+{
+    "jump", "jb", "jbe", "ja", "jae", "je", "jne"
+};
+
+int JumpNum(const char* str)
+{
+    CHECKUS(str != NULL, 1);
+    int jump_amount = sizeof(jump_list) / sizeof(*jump_list);
+    for (int i = 0; i < jump_amount; i++)
+    {
+        if (strcmp(str, jump_list[i]) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int RegNum(const char* str)
+{
+    CHECKUS(str != NULL, 1);
+    int register_amount = sizeof(register_list) / sizeof(*register_list);
+    for (int i = 0; i < register_amount; i++)
+    {
+        if (strcmp(str, register_list[i]) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 #define DEF_CMD(name, num, ...)             \
 else if (strcmp(str, #name) == 0)           \
 {                                           \
@@ -26,7 +60,152 @@ int CommandNum(const char* str)
 #undef DEF_CMD
 
 
-int IsAllowedDigitsInt(char* str)
+#define DEF_CMD(name, num, need_arg, ...)                                       \
+else if (strcmp(indexPtr[line], #name) == 0)                                    \
+{                                                                               \
+    result[result_pointer] = num;                                               \
+    if (need_arg)                                                               \
+    {                                                                           \
+        do_return = GetArg(&result[result_pointer], &result_pointer, indexPtr, &line, listing_file);  \
+    }                                                                           \
+    else                                                                        \
+    {                                                                           \
+        PrintListing(listing_file, &result[result_pointer], 1);                 \
+    }                                                                           \
+    result_pointer += 1;                                                        \
+    line += 1;                                                                  \
+}
+
+int AssembleAll(char** indexPtr, unsigned char* result, FILE* listing_file, label_struct* label_list, int* label_counter_p, int line_amount, int passage, int* byte_amount)
+{
+    int line = 0, result_pointer = 0, do_return = 0;
+
+    while (line < line_amount || do_return != 0)
+    {
+        if (do_return != 0)
+        {
+            return 1;
+        }
+        else if (indexPtr[line][strlen(indexPtr[line]) - 1] == ':') // label:
+        {
+            //printf("Label found: \"%s\"\n", indexPtr[line]);
+            if (IsLabel(indexPtr[line]))
+            {
+                if (passage != 0)
+                {
+                    line += 1;
+                }
+                else if (FindLabel(indexPtr[line], label_list, *label_counter_p) < 0)
+                {
+                    //printf("Label added: \"%s\"\n", indexPtr[line]);
+                    (label_list[*label_counter_p]).name = indexPtr[line];
+                    (label_list[*label_counter_p]).adress = result_pointer;
+                    *label_counter_p += 1;
+                    line += 1;
+                    // do not increace result_pointer
+                }
+                else
+                {
+                    printf("Multiple declaration for label \"%s\" (second declaration in word number %i)\n", indexPtr[line], line + 1);
+                    return 1;
+                }
+            }
+            else
+            {
+                printf("Not allowed name for label \"%s\" (word number %i)\n", indexPtr[line], line + 1);
+                return 1;
+            }
+        }
+        else if (JumpNum(indexPtr[line]) >= 0 && CommandNum(indexPtr[line]) >= 0) // jump label
+        {
+            if (passage == 0)
+            {
+                //printf("Jump skipped \"%s\"\n", indexPtr[line + 1]);
+                result_pointer += 2;
+                line += 2;
+            }
+            else
+            {
+                int i = FindLabel(indexPtr[line + 1], label_list, *label_counter_p);
+                if (i < 0)
+                {
+                    printf("Cannot find jump label \"%s\" (word number %i)\n", indexPtr[line + 1], line + 2);
+                    return 1;
+                }
+                result[result_pointer] = CommandNum(indexPtr[line]);
+                result[result_pointer + 1] = i;
+                PrintListing(listing_file, &result[result_pointer], 2);
+                result_pointer += 2;
+                line += 2;
+            }
+        }
+
+        #include "command.h" // defined check for all commands from "command.h"
+
+        else // error
+        {
+            printf("Unknown command \"%s\" (word number %i)\n", indexPtr[line], line + 1);
+            return 1;
+        }
+    }
+    *byte_amount = result_pointer;
+    //printf("----------------------\n");
+    return 0;
+}
+#undef DEF_CMD
+
+
+
+int IsLabel(const char* str)
+{
+    CHECKUS(str != NULL, 1);
+    int i = 0, k = strlen(str) - 1;
+    if (str[k] != ':')
+    {
+        return 0;
+    }
+    while (i < k)
+    {
+        if (!(isalnum(str[i])))
+        {
+            return 0;
+        }
+        i++;
+    }
+    return 1;
+}
+
+int FindLabel(const char* str, const label_struct* label_list, const int label_amount)
+{
+    CHECKUS(str != NULL, 1);
+    CHECKUS(label_list != NULL, 1);
+
+    int label_length = 0, max_length = 0, str_length = strlen(str);
+
+    if (str[str_length - 1] == ':')
+    {
+        str_length -= 1;
+    }
+
+    for (int i = 0; i < label_amount; i++)
+    {
+        label_length = strlen(label_list[i].name);
+        if (label_list[i].name[label_length - 1] == ':')
+        {
+            label_length -= 1;
+        }
+
+        max_length = (label_length > str_length) ? label_length : str_length;
+
+        if (strncmp(str, label_list[i].name, max_length) == 0)
+        {
+            return label_list[i].adress;
+        }
+    }
+    return -1;
+}
+
+int IsAllowedDigitsInt(const char* str)
 {
     CHECKUS(str != NULL, 1);
     int i = 0;
@@ -41,7 +220,7 @@ int IsAllowedDigitsInt(char* str)
     return 1;
 }
 
-int IsAllowedDigitsDouble(char* str)
+int IsAllowedDigitsDouble(const char* str)
 {
     CHECKUS(str != NULL, 1);
     int i = 0;
@@ -98,7 +277,7 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
     {
         // for jump
     }
-    else if (command_num == 1 && CommandNum(str1) >= 0) // empty (pop)
+    else if (command_num == 1 && (CommandNum(str1) >= 0 || str1[argument_length - 1] == ':')) // empty (pop)
     {
         PrintListing(listing_file, command_data_p, 1);
         return 0;
@@ -157,23 +336,8 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
     else // error
     {
         printf("Wrong argument \"%s\" in command \"%s\" (word number %i)\n", str1, str0, line + 1);
-        printf("CommandNum(str1): %i\n", CommandNum(str1));
         return 1;
     }
     return 0;
 }
 
-
-int RegNum(const char* str)
-{
-    CHECKUS(str != NULL, 1);
-    int register_amount = sizeof(register_list) / sizeof(*register_list);
-    for (int i = 0; i < register_amount; i++)
-    {
-        if (strcmp(str, register_list[i]) == 0)
-        {
-            return i;
-        }
-    }
-    return -1;
-}

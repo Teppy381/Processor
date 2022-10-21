@@ -16,18 +16,9 @@ int main()
         return 1;
     }
 
-
     Proc_struct proc = {0};
 
-
     fscanf(input_file, "%i", &proc.length);
-
-/*     int cn = 0;
-    int length = 0;
-    Stack* stack = NULL;
-    Elem_t* RAM = NULL;
-    Elem_t* reg = NULL;
-    unsigned char* input_data = NULL; */
 
     proc.stack_p    =    (Stack*)      calloc(1, sizeof(*proc.stack_p));
     proc.RAM        =    (Elem_t*)     calloc(256, sizeof(*proc.RAM));
@@ -51,11 +42,11 @@ int main()
         printf("!!! ERROR !!!\n");
         return 1;
     }
-    else if (i == 2)
+    else if (i == 2) // halt
     {
         printf("Program halted\n");
     }
-    else
+    else // file ended
     {
         printf("Run out of code\n");
     }
@@ -65,6 +56,6 @@ int main()
     free(proc.RAM);
     free(proc.reg);
     free(proc.input_data);
-    printf("BOOM BEACH PROCESSED !!!))\n");
+    return 0;
 }
 

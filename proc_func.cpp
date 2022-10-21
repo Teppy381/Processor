@@ -29,6 +29,19 @@ int CheckSignature(FILE* input_file, const int local_version, const char* input_
     return 0;
 }
 
+void ClearInput()
+{
+    while (getchar() != '\n') {};
+}
+
+int IsEqual(Elem_t x, Elem_t y)
+{
+    if (fabs(x - y) < ZERO_ACCURACY)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 int ExecuteCode(Proc_struct* proc_p)
 {

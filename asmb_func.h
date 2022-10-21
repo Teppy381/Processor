@@ -18,11 +18,23 @@
     } while (0)
 
 
-
+typedef struct label_struct
+{
+    char* name = NULL;
+    int adress = 0;
+} label_struct;
 
 int CommandNum(const char* str);
 
-int IsNumber(char* str, int symbol_amount);
+int AssembleAll(char** indexPtr, unsigned char* result, FILE* listing_file, label_struct* label_list, int* label_counter_p, int line_amount, int passage, int* byte_amount);
+
+int IsLabel(const char* str);
+
+int FindLabel(const char* str, const label_struct* label_list, const int label_amount);
+
+int IsAllowedDigitsInt(const char* str);
+
+int IsAllowedDigitsDouble(const char* str);
 
 int BytewiseDouble(unsigned char* str, double n);
 

@@ -14,31 +14,13 @@ pop [rdx] = 61 | 03
 
 add sub mul div
 
-inp ?
+in
 out
-
-dump
-jump
 hlt
+
+jump label
+label:
 */
-
-
-#define DEF_CMD(name, num, need_arg, ...)                                       \
-else if (strcmp(indexPtr[line], #name) == 0)                                    \
-{                                                                               \
-    result[result_pointer] = num;                                               \
-    if (need_arg)                                                               \
-    {                                                                           \
-        do_return = GetArg(&result[result_pointer], &result_pointer, indexPtr, &line, listing_file);  \
-    }                                                                           \
-    else                                                                        \
-    {                                                                           \
-        PrintListing(listing_file, &result[result_pointer], 1);                 \
-    }                                                                           \
-    result_pointer += 1;                                                        \
-    line += 1;                                                                  \
-}
-
 
 
 int main()
@@ -54,6 +36,7 @@ int main()
     int line_amount = Countlines(buffer, simbol_amount);
 
     char** indexPtr = (char**) calloc(line_amount + 1, sizeof(char*));
+    CHECKUS(indexPtr != NULL, 1);
 
     SplitToLines(indexPtr, buffer, simbol_amount);
 
@@ -63,42 +46,40 @@ int main()
     FILE* listing_file = fopen("Y-listing.txt", "w");
     CHECKUS(listing_file != NULL, 1);
 
-    int line = 0, result_pointer = 0, do_return = 0;
+    int byte_amount = 0;
 
-    while (line < line_amount)
+    label_struct* label_list = (label_struct*) calloc(256, sizeof(*label_list));
+    int label_counter = 0;
+
+    if (AssembleAll(indexPtr, result, listing_file, label_list, &label_counter, line_amount, 0, &byte_amount) != 0)
     {
-        // need check for jump marker
-        if (do_return != 0)
-        {
-            free(buffer);
-            free(indexPtr);
-            free(result);
-            return 1;
-        }
+        free(label_list);
+        free(buffer);
+        free(indexPtr);
+        free(result);
+        return 1;
+    }
 
-        #include "command.h" // defined check for all commands from "command.h"
+    fseek(listing_file, 0, SEEK_SET);
 
-        else // error
-        {
-            printf("Unknown command \"%s\" (word number %i)\n", indexPtr[line], line + 1);
-            free(buffer);
-            free(indexPtr);
-            free(result);
-            return 1;
-        }
+    if (AssembleAll(indexPtr, result, listing_file, label_list, &label_counter, line_amount, 1, &byte_amount) != 0)
+    {
+        free(label_list);
+        free(buffer);
+        free(indexPtr);
+        free(result);
+        return 1;
     }
 
 
     FILE* result_file = fopen("Y-compiled.txt", "w");
     CHECKUS(result_file != NULL, 1);
 
-/*
-    OutputResult(result_file, indexPtr, line_amount);
-*/
 
-    fprintf(result_file, "%c%c%i", 41, local_version, result_pointer);
-    fwrite(result, sizeof(*result), result_pointer, result_file);
+    fprintf(result_file, "%c%c%i", 41, local_version, byte_amount);
+    fwrite(result, sizeof(*result), byte_amount, result_file);
 
+    free(label_list);
     free(buffer);
     free(indexPtr);
     free(result);

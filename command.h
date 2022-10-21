@@ -60,12 +60,142 @@ DEF_CMD(out, 6, 0,
     printf("%lg\n", x);
     return 0;
 })
+
 DEF_CMD(in, 7, 0,
 {
     Elem_t x = 0;
-    scanf("%lg", &x);
+    printf("Enter a number: ");
+    if (scanf("%lg", &x) != 1)
+    {
+        printf("It's not a number, try again\n");
+        proc_p->cn -= 1;
+    }
+    ClearInput();
     Push(proc_p->stack_p, x);
     return 0;
 })
 
-DEF_CMD(hlt, 8, 0, {return 2;})
+DEF_CMD(hlt, 8, 0,
+{
+    return 2;
+})
+
+DEF_CMD(jump, 9, 0,
+{
+    proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    return 0;
+})
+
+DEF_CMD(jb, 10, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (y < x)
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
+
+DEF_CMD(jbe, 11, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (y <= x)
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
+
+DEF_CMD(ja, 12, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (y > x)
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
+
+DEF_CMD(jae, 13, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (y >= x)
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
+
+DEF_CMD(je, 14, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (IsEqual(x, y))
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
+
+DEF_CMD(jne, 15, 0,
+{
+    Elem_t x = 0;
+    Elem_t y = 0;
+    if (Pop(proc_p->stack_p, &x) != 0)
+        return 1;
+    if (Pop(proc_p->stack_p, &y) != 0)
+        return 1;
+    if (!(IsEqual(x, y)))
+    {
+        proc_p->cn = proc_p->input_data[proc_p->cn + 1] - 1;
+    }
+    else
+    {
+        proc_p->cn += 1;
+    }
+    return 0;
+})
