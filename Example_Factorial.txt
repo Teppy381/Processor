@@ -1,0 +1,21 @@
+; factorial
+in
+pop rax
+push 1
+
+step:
+push 1
+push rax
+jae end
+
+push rax
+mul
+push rax
+push 1
+sub
+pop rax
+jump step
+
+end:
+out
+hlt

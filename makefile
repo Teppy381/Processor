@@ -1,41 +1,45 @@
 CXX_FLAGS = -Wall -Wextra -fsanitize=address -g -ggdb3
 
+DIR_FLAGS = -IASM -ICPU -IDISASM -IEXTRA
+
+CXX_FLAGS += $(DIR_FLAGS)
+
+
 all: processor assembler disassembler
 
 
+processor: OBJECTS/proc_main.o OBJECTS/proc_func.o OBJECTS/stack_func.o
+	g++ OBJECTS/proc_main.o OBJECTS/proc_func.o OBJECTS/stack_func.o $(CXX_FLAGS) -o CPU.out
 
-processor: o/proc_main.o o/proc_func.o o/stack_func.o
-	g++ o/proc_main.o o/proc_func.o o/stack_func.o $(CXX_FLAGS) -o X-processor.out
+OBJECTS/proc_main.o: CPU/proc_main.cpp
+	g++ -c -o OBJECTS/proc_main.o CPU/proc_main.cpp $(CXX_FLAGS)
 
-o/proc_main.o: proc_main.cpp
-	g++ -c -o o/proc_main.o proc_main.cpp $(CXX_FLAGS)
+OBJECTS/stack_func.o: EXTRA/stack_func.cpp
+	g++ -c -o OBJECTS/stack_func.o EXTRA/stack_func.cpp	$(CXX_FLAGS)
 
-o/stack_func.o: stack_func.cpp
-	g++ -c -o o/stack_func.o stack_func.cpp	$(CXX_FLAGS)
-
-o/proc_func.o: proc_func.cpp
-	g++ -c -o o/proc_func.o proc_func.cpp	$(CXX_FLAGS)
-
-
-
-
-assembler: o/asmb_main.o o/asmb_func.o o/onegin_func.o
-	g++ o/asmb_main.o o/asmb_func.o o/onegin_func.o $(CXX_FLAGS) -o X-assembler.out
-
-o/asmb_main.o: asmb_main.cpp
-	g++ -c -o o/asmb_main.o asmb_main.cpp $(CXX_FLAGS)
-
-o/asmb_func.o: asmb_func.cpp
-	g++ -c -o o/asmb_func.o asmb_func.cpp $(CXX_FLAGS)
-
-o/onegin_func.o: onegin_func.cpp
-	g++ -c -o o/onegin_func.o onegin_func.cpp	$(CXX_FLAGS)
+OBJECTS/proc_func.o: CPU/proc_func.cpp
+	g++ -c -o OBJECTS/proc_func.o CPU/proc_func.cpp	$(CXX_FLAGS)
 
 
 
 
-disassembler: o/disasmb_main.o
-	g++ o/disasmb_main.o $(CXX_FLAGS) -o X-disassembler.out
+assembler: OBJECTS/asmb_main.o OBJECTS/asmb_func.o OBJECTS/onegin_func.o
+	g++ OBJECTS/asmb_main.o OBJECTS/asmb_func.o OBJECTS/onegin_func.o $(CXX_FLAGS) -o ASM.out
 
-o/disasmb_main.o: disasmb_main.cpp
-	g++ -c -o o/disasmb_main.o disasmb_main.cpp $(CXX_FLAGS)
+OBJECTS/asmb_main.o: ASM/asmb_main.cpp
+	g++ -c -o OBJECTS/asmb_main.o ASM/asmb_main.cpp $(CXX_FLAGS)
+
+OBJECTS/asmb_func.o: ASM/asmb_func.cpp
+	g++ -c -o OBJECTS/asmb_func.o ASM/asmb_func.cpp $(CXX_FLAGS)
+
+OBJECTS/onegin_func.o: EXTRA/onegin_func.cpp
+	g++ -c -o OBJECTS/onegin_func.o EXTRA/onegin_func.cpp	$(CXX_FLAGS)
+
+
+
+
+disassembler: OBJECTS/disasmb_main.o
+	g++ OBJECTS/disasmb_main.o $(CXX_FLAGS) -o DISASM.out
+
+OBJECTS/disasmb_main.o: DISASM/disasmb_main.cpp
+	g++ -c -o OBJECTS/disasmb_main.o DISASM/disasmb_main.cpp $(CXX_FLAGS)
