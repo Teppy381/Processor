@@ -1,7 +1,0 @@
-push 12.24
-faf:
-push 10
-in
-ja faf
-push 1242
-out
