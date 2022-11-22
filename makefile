@@ -5,7 +5,7 @@ DIR_FLAGS = -IASM -ICPU -IDISASM -IEXTRA
 CXX_FLAGS += $(DIR_FLAGS)
 
 
-all: processor assembler disassembler
+all: objects processor assembler disassembler
 
 
 processor: OBJECTS/proc_main.o OBJECTS/proc_func.o OBJECTS/stack_func.o
@@ -43,3 +43,8 @@ disassembler: OBJECTS/disasmb_main.o
 
 OBJECTS/disasmb_main.o: DISASM/disasmb_main.cpp
 	g++ -c -o OBJECTS/disasmb_main.o DISASM/disasmb_main.cpp $(CXX_FLAGS)
+
+
+
+objects:
+	mkdir -p OBJECTS
