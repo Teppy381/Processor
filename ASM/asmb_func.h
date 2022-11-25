@@ -36,8 +36,6 @@ int IsAllowedDigitsInt(const char* str);
 
 int IsAllowedDigitsDouble(const char* str);
 
-int BytewiseDouble(unsigned char* str, double n);
-
 int PrintListing(FILE* listing_file, unsigned char* str, int n);
 
 int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr, int* line_p, FILE* listing_file);

@@ -1,4 +1,5 @@
 #include "proc_func.h"
+#include "command+.h"
 
 // signature = ')' (41), version, length (in bytes)
 
@@ -6,7 +7,6 @@
 int main(int argc, char** argv)
 {
     const int local_version = 2;
-    const int register_amount = 4;
 
     if (argc < 2)
     {

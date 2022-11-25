@@ -1,14 +1,6 @@
 #include "asmb_func.h"
-
-const char* register_list[] =
-{
-    "rax", "rbx", "rcx", "rdx"
-};
-
-const char* jump_list[] =
-{
-    "jump", "jb", "jbe", "ja", "jae", "je", "jne"
-};
+#include "command+.h"
+#include "command++.h"
 
 int JumpNum(const char* str)
 {
@@ -80,6 +72,8 @@ int AssembleAll(char** indexPtr, unsigned char* result, FILE* listing_file, labe
 {
     int line = 0, result_pointer = 0, do_return = 0;
 
+    printf(KRED Kbright);
+
     while (line < line_amount || do_return != 0)
     {
         if (do_return != 0)
@@ -149,7 +143,8 @@ int AssembleAll(char** indexPtr, unsigned char* result, FILE* listing_file, labe
         }
     }
     *byte_amount = result_pointer;
-    //printf("----------------------\n");
+
+    printf(KNRM);
     return 0;
 }
 #undef DEF_CMD
@@ -236,17 +231,6 @@ int IsAllowedDigitsDouble(const char* str)
 }
 
 
-int BytewiseDouble(unsigned char* data, double n)
-{
-    CHECKUS(data != NULL, 1);
-    unsigned char* n_p = (unsigned char*) &n;
-    for (int i = 0; i < 8; i++)
-    {
-        data[i] = n_p[i];
-    }
-    return 0;
-}
-
 int PrintListing(FILE* listing_file, unsigned char* str, int n)
 {
     CHECKUS(str != NULL, 1);
@@ -274,6 +258,8 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
     double double_buf_num = 0;
     int int_buf_num = 0;
 
+    printf(KRED Kbright);
+
     if (command_num == 1 && (CommandNum(str1) >= 0 || str1[argument_length - 1] == ':')) // empty (pop)
     {
         PrintListing(listing_file, command_data_p, 1);
@@ -281,15 +267,15 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
     }
     else if (command_num == 0 && IsAllowedDigitsDouble(str1) && sscanf(str1, "%lf", &double_buf_num) == 1) // double (push)
     {
-        BytewiseDouble(command_data_p + 1, double_buf_num);
+        memcpy(command_data_p + 1, &double_buf_num, 8);
         PrintListing(listing_file, command_data_p, 9);
         *result_pointer_p += 8;
         *line_p += 1;
     }
-    else if (str1[0] == '['  &&  str1[argument_length - 1] == ']') // [rax] or [10] (+ 64)
+    else if (str1[0] == '['  &&  str1[argument_length - 1] == ']') // [rax] or [10] (+ RAM_FLAG)
     {
         char* str_buf = strndup(str1 + 1, argument_length - 2);
-        *command_data_p += 64;
+        *command_data_p += RAM_FLAG;
 
         if (IsAllowedDigitsInt(str_buf) == 1) // 10 (+ 0)
         {
@@ -305,10 +291,10 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
             *result_pointer_p += 1;
             *line_p += 1;
         }
-        else if (RegNum(str_buf) >= 0) // rax (+ 32)
+        else if (RegNum(str_buf) >= 0) // rax (+ REG_FLAG)
         {
             *(command_data_p + 1) = RegNum(str_buf);
-            *command_data_p += 32;
+            *command_data_p += REG_FLAG;
             *result_pointer_p += 1;
             *line_p += 1;
         }
@@ -322,10 +308,10 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
         PrintListing(listing_file, command_data_p, 2);
         free(str_buf);
     }
-    else if (RegNum(str1) >= 0) // rax (+ 32)
+    else if (RegNum(str1) >= 0) // rax (+ REG_FLAG)
     {
         *(command_data_p + 1) = RegNum(str1);
-        *command_data_p += 32;
+        *command_data_p += REG_FLAG;
         PrintListing(listing_file, command_data_p, 2);
         *result_pointer_p += 1;
         *line_p += 1;
@@ -335,6 +321,8 @@ int GetArg(unsigned char* command_data_p, int* result_pointer_p, char** indexPtr
         printf("Wrong argument \"%s\" in command \"%s\" (word number %i)\n", str1, str0, line + 1);
         return 1;
     }
+
+    printf(KNRM);
     return 0;
 }
 

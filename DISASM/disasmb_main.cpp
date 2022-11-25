@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-const char* register_list[] =
-{
-    "rax", "rbx", "rcx", "rdx"
-};
+#include "colors.h"
+#include "command+.h"
+#include "command++.h"
 
 #define DEF_CMD(name, num, need_arg, ...)                       \
 else if ((input[cn] & 15) == num)                               \
@@ -35,17 +33,17 @@ int PrintArg(unsigned char* command_data, int* cn_p, FILE* output_file)
 {
     unsigned char cmd_data = command_data[0];
     unsigned char arg_data = command_data[1];
-    if ((cmd_data & 32) && (cmd_data & 64)) // [rax]
+    if ((cmd_data & REG_FLAG) && (cmd_data & RAM_FLAG)) // [rax]
     {
         fprintf(output_file, " [%s]", register_list[arg_data]);
         *cn_p += 1;
     }
-    else if (cmd_data & 32) // rax
+    else if (cmd_data & REG_FLAG) // rax
     {
         fprintf(output_file, " %s", register_list[arg_data]);
         *cn_p += 1;
     }
-    else if (cmd_data & 64) // [10]
+    else if (cmd_data & RAM_FLAG) // [10]
     {
         fprintf(output_file, " [%i]", arg_data);
         *cn_p += 1;
@@ -69,13 +67,42 @@ int PrintArg(unsigned char* command_data, int* cn_p, FILE* output_file)
 }
 
 // signature = ')' (41), version, length (in bytes)
-int main()
+int main(int argc, char** argv)
 {
     const int local_version = 1;
-    const char* in_file_name = "Y-compiled.txt";
-    const char* out_file_name = "Y-decompiled.txt";
-    FILE* input_file = fopen(in_file_name, "rb");
+    const char* in_file_name = NULL;
+    const char* out_file_name = NULL;
+
+    if (argc < 2)
+    {
+        printf(KRED Kbright "Please specify the name of the executable file like this:\n"
+                    KNRM Kbright "%s Compiled.txt\n" KNRM, argv[0]);
+        return 1;
+    }
+    in_file_name = argv[1];
+
+    if (argc > 2)
+    {
+        out_file_name = argv[2];
+    }
+    else
+    {
+        out_file_name = "Decompiled.txt";
+    }
+
     FILE* output_file = fopen(out_file_name, "wb");
+    FILE* input_file = fopen(in_file_name, "rb");
+
+    if (output_file == NULL)
+    {
+        printf(KRED Kbright "Cannot create file <%s>\n" KNRM, out_file_name);
+        return 1;
+    }
+    if (input_file == NULL)
+    {
+        printf(KRED Kbright "Cannot find file <%s>\n" KNRM, in_file_name);
+        return 1;
+    }
 
     char signature = 0, version = 0;
     int length = 0;
@@ -131,5 +158,5 @@ int main()
     fclose(input_file);
     fclose(output_file);
     free(input);
-    printf("BOOM BEACH DISASSEMBLED!!!\n");
+    printf(KGRN Kbright"Successfully decompilated in file <%s>\n" KNRM, out_file_name);
 }

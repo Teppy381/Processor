@@ -5,6 +5,7 @@
 #include "colors.h"
 #include <math.h>
 
+
 typedef struct Proc_struct
 {
     int cn = 0;

@@ -1,5 +1,5 @@
 #include "proc_func.h"
-
+#include "command++.h"
 
 int CheckSignature(FILE* input_file, const int local_version, const char* input_file_name)
 {
@@ -17,11 +17,11 @@ int CheckSignature(FILE* input_file, const int local_version, const char* input_
         // make numbers in version after '.' random
         if (version == 0)
         {
-            printf("Incompatable versions\nAssembler version: unknown, Disassembler version: %i.35-2\n", local_version);
+            printf("Incompatable versions\nASM version: unknown, CPU version: %i.35-2\n", local_version);
         }
         else
         {
-            printf("Incompatable versions\nAssembler version: %i.27-1, Disassembler version: %i.35-2\n", version, local_version);
+            printf("Incompatable versions\nASM version: %i.27-1, CPU version: %i.35-2\n", version, local_version);
         }
         fclose(input_file);
         return 1;
@@ -74,18 +74,15 @@ int ExecuteCommand(Proc_struct* proc_p)
 {
     int num = (int) proc_p->input_data[proc_p->cn];
 
-    if (num == 0 || num == 32 || num == 64 || num == 96)
+    if (num == 0 || num == REG_FLAG || num == RAM_FLAG || num == REG_FLAG + RAM_FLAG) // push
     {
         num = 0;
     }
-    else if (num == 1 || num == 33 || num == 65 || num == 97)
+    else if (num == 1|| num == 1 + REG_FLAG || num == 1 + RAM_FLAG || num == 1 + REG_FLAG + RAM_FLAG) // pop
     {
         num = 1;
     }
 
-    // (15 = 00001111) (240 = 11110000)
-
-    // printf("ExecuteCommand num: %i\n", num);
     switch (num)
     {
         #include "command.h"
@@ -98,18 +95,6 @@ int ExecuteCommand(Proc_struct* proc_p)
 }
 #undef DEF_CMD
 
-
-/*
-push number (double) = 00 | 09 90 38 91 38 29 83 29
-push rbx             = 20 | 01
-push [10]            = 40 | 0a
-push [rcx]           = 60 | 02
-
-pop (empty) = 01 |
-pop rbx     = 21 | 01
-pop [10]    = 41 | 0a
-pop [rdx]   = 61 | 03
-*/
 
 int ExecutePush(Proc_struct* proc_p)
 {
