@@ -1,7 +1,34 @@
-# Processor (ASM, DISASM, CPU)
+## Processor (ASM, DISASM, CPU) ##
+---
+**Before start you need to use makefile to create ASM.out, CPU.out and DISASM.out**
+  
+---
+### Example of use:
+Here is the contents of the **My_Code.txt** file:
+```
+in
+push 1
+sub
+dup
+mul
+out
+hlt
+```
+This program represents formula **(x - 1)^2**
+  
+We can compile it in console:
+```
+./ASM.out My_Code.txt Compiled_Code.txt
+```
+This will create file **Compiled_Code.txt** in local folder
+  
+Now we can run it:
+```
+./CPU.out Compiled_Code.txt
+```
 
-- How to compile and run your ASM code:
-0) Use makefile to create ASM.out, DISASM.out and CPU.out
-1) Write your ASM code in your .txt file
-2) Use ASM.out on that file with code and get compiled file
-3) Use CPU.out on compiled file and your program should work
+Also we can decompile this file:
+```
+./DISASM.out Compiled_Code.txt My_Decompiled_Code.txt
+```
+That will create file **My_Decompiled_Code.txt** in local folder
